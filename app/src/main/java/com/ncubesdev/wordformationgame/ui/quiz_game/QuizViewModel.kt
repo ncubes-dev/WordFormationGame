@@ -1,11 +1,11 @@
-package com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.quiz_game
+package com.ncubesdev.wordformationgame.ui.quiz_game
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ncubesdev.zimsecpastexampapersandmarksschemes.repos.DataStoreRepository
-import com.ncubesdev.zimsecpastexampapersandmarksschemes.util.Constants
-import com.ncubesdev.zimsecpastexampapersandmarksschemes.util.Constants.quizWords
+import com.ncubesdev.wordformationgame.repos.DataStoreRepository
+import com.ncubesdev.wordformationgame.util.Constants
+import com.ncubesdev.wordformationgame.util.Constants.quizWords
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,19 +14,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
-    private val dataStoreRepository: DataStoreRepository) : ViewModel() {
+    private val dataStoreRepository: DataStoreRepository
+) : ViewModel() {
     val answers= mutableStateListOf<String>()
     private var _validWords = MutableStateFlow<List<String>>(emptyList())
     val validWords = _validWords.asStateFlow()
     private val characters = ('a'..'z').toList()
 
-    private var _possibleStrings = MutableStateFlow<String>("")
+    private var _possibleStrings = MutableStateFlow("")
     val possibleStrings = _possibleStrings.asStateFlow()
 
-    private var _highScore = MutableStateFlow<String>("0")
+    private var _highScore = MutableStateFlow("0")
     val highScore = _highScore.asStateFlow()
 
-    private var _numberOfGames = MutableStateFlow<String>("0")
+    private var _numberOfGames = MutableStateFlow("0")
     val numberOfGames = _numberOfGames.asStateFlow()
 
     init {

@@ -1,4 +1,4 @@
-package com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.quiz_game
+package com.ncubesdev.wordformationgame.ui.quiz_game
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.size
@@ -6,18 +6,16 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun GameButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+
 ) {
-    var isPressed by remember { mutableStateOf(false) }
+    val isPressed by remember { mutableStateOf(false) }
     val backgroundColor by animateColorAsState(
         if (isPressed) MaterialTheme.colors.secondary else MaterialTheme.colors.primary
     )

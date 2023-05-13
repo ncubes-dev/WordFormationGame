@@ -1,33 +1,9 @@
-package com.ncubesdev.zimsecpastexampapersandmarksschemes.util
-
+package com.ncubesdev.wordformationgame.util
 object Constants {
+    val GAME_NUMBER="gameNumber"
+    val SCORE="score"
     val gameInstructions= listOf<String>("Type a four letter word using the given letters and submit. if the word is valid you will win if there are no other words that can be made with the given letters ")
-    const val QUIZ="quiz"
-    const val EXPLORE= "explore"
-    const val SUBJECT= "subject"
-    const val SCORE= "score"
-    const val GAME_NUMBER= "game_number"
-    const val LEVEL= "level"
-    const val GAME= "game"
-    const val PRACTICE= "practice"
-    const val PRACTICE_SCREEN= "practice_screen"
-    const val DISPLAY= "display"
     const val USER_PREFERENCES_NAME = "user_preferences"
-    val dropDownListItemsForSubjects = listOf(
-        "Maths",
-        "English",
-        "Accounts",
-        "Geography",
-        "Physics",
-        "Chemistry",
-        "Biology",
-        "Combined Science",
-        "Computer Science",
-    )
-    val dropDownListItemsForMonth = listOf(
-        "November",
-        "June",
-    )
     val quizWords = listOf<String>(
         "abay",
         "abba",
@@ -3471,69 +3447,4 @@ object Constants {
         "zubr",
         "zulu",
         "zyme")
-    val disclaimer = listOf("Please note that the content on this page is generated using AI and while most of it is accurate, there is a possibility that some information may be incorrect.\nby \nNcubesdev\n(The developer)")
-    val dropDownListItemsForLevel = listOf(
-        "A' level",
-        "O' level",
-    )
-    val dropDownListItemsForPaper = listOf(
-        "1", "2", "3", "4", "5", "6","syllabus","green book"
-    )
-    val dropDownListItemsForYear = listOf(
-        2000,
-        2001,
-        2002,
-        2003,
-        2004,
-        2005,
-        2006,
-        2007,
-        2008,
-        2009,
-        2010,
-        2011,
-        2012,
-        2013,
-        2014,
-        2015,
-        2016,
-        2017,
-        2018,
-        2019,
-        2020,
-        2021,
-        2022,
-        2023,
-        2024,
-        2025,
-        2026,
-        2027,
-        2028,
-        2029,
-        2030,
-        2031,
-        2032,
-        2033,
-        2034,
-        2035,
-        2036,
-        2037,
-        2038,
-        2039,
-        2040,
-        2041,
-        2042,
-        2043,
-        2044,
-        2045,
-        2046,
-        2047,
-        2048,
-        2049,
-        2050
-    )
-    const val UPLOAD_SCREEN = "addScreen"
-    const val UPDATE_SCREEN = "updateScreen"
-    const val CHAT_SCREEN = "chatScreen"
-    const val PDF_VIEWER_SCREEN = "home"
 }

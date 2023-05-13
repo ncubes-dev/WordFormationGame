@@ -1,4 +1,4 @@
-package com.ncubesdev.zimsecpastexampapersandmarksschemes.repos
+package com.ncubesdev.wordformationgame.repos
 
 import kotlinx.coroutines.flow.Flow
 

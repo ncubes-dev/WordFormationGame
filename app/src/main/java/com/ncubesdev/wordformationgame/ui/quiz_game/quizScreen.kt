@@ -1,4 +1,4 @@
-package com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.quiz_game
+package com.ncubesdev.wordformationgame.ui.quiz_game
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
@@ -14,21 +14,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ncubesdev.zimsecpastexampapersandmarksschemes.util.Constants
+import com.ncubesdev.wordformationgame.util.Constants
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
-@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun QuizScreen(quizViewModel: QuizViewModel) {
     var isDropDown by remember { mutableStateOf(false) }
     val scaffoldState = rememberScaffoldState()
-    val validWords by quizViewModel.validWords.collectAsStateWithLifecycle()
-    val possibleStrings by quizViewModel.possibleStrings.collectAsStateWithLifecycle()
-    val highScore by quizViewModel.highScore.collectAsStateWithLifecycle()
-    val numberOfGames by quizViewModel.numberOfGames.collectAsStateWithLifecycle()
+    val validWords by quizViewModel.validWords.collectAsState()
+    val possibleStrings by quizViewModel.possibleStrings.collectAsState()
+    val highScore by quizViewModel.highScore.collectAsState()
+    val numberOfGames by quizViewModel.numberOfGames.collectAsState()
     val charactersList = derivedStateOf {
         possibleStrings.toCharArray()
     }

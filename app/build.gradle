@@ -20,8 +20,18 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
-    }
+        buildFeatures {
+            compose true
+        }
 
+        composeOptions {
+            kotlinCompilerExtensionVersion = "1.4.7"
+        }
+
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
+    }
     buildTypes {
         release {
             minifyEnabled true

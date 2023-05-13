@@ -1,4 +1,4 @@
-package com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.theme
+package com.ncubesdev.wordformationgame.ui.theme
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -7,6 +7,8 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.theme.Shapes
+import com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.theme.Typography
 
 @SuppressLint("ConflictingOnColor")
 private val DarkColorPalette = darkColors(
@@ -36,7 +38,7 @@ private val LightColorPalette = lightColors(
 )
 
 @Composable
-fun ZimsecPastExamPapersAndMarksSchemesTheme(
+fun WordFormationGameTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
