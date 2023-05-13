@@ -9,9 +9,9 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.play.core.review.ReviewManagerFactory
-import com.ncubesdev.wordformationgame.ui.theme.WordFormationGameTheme
 import com.ncubesdev.wordformationgame.ui.quiz_game.QuizScreen
 import com.ncubesdev.wordformationgame.ui.quiz_game.QuizViewModel
+import com.ncubesdev.wordformationgame.ui.theme.WordFormationGameTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

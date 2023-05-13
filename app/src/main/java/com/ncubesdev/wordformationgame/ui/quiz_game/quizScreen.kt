@@ -53,12 +53,12 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                     )) {
                         SnackbarResult.Dismissed -> {}
                         SnackbarResult.ActionPerformed -> {
-                            answer.value=""
+                            answer.value = ""
                             showAnswer.value = false
-                            isPressed0.value=false
-                            isPressed1.value=false
-                            isPressed2.value=false
-                            isPressed3.value=false
+                            isPressed0.value = false
+                            isPressed1.value = false
+                            isPressed2.value = false
+                            isPressed3.value = false
                             quizViewModel.onEvent(QuizGameScreenEvent.ReStart)
                             quizViewModel.onEvent(QuizGameScreenEvent.AddGameNumber)
                         }
@@ -102,15 +102,15 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    if (!isPressed1.value){
+                    if (!isPressed1.value) {
                         GameButton(text = charactersList.value[1].toString(), onClick = {
-                            isPressed1.value=true
+                            isPressed1.value = true
                             answer.value = answer.value + charactersList.value[1].toString()
                         })
                     }
-                    if (!isPressed2.value){
+                    if (!isPressed2.value) {
                         GameButton(text = charactersList.value[2].toString(), onClick = {
-                            isPressed2.value=true
+                            isPressed2.value = true
                             answer.value = answer.value + charactersList.value[2].toString()
                         })
                     }
@@ -119,9 +119,9 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    if (!isPressed0.value){
+                    if (!isPressed0.value) {
                         GameButton(text = charactersList.value[0].toString(), onClick = {
-                            isPressed0.value=true
+                            isPressed0.value = true
                             answer.value = answer.value + charactersList.value[0].toString()
                         })
                     }
@@ -150,9 +150,9 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                         contentColor = MaterialTheme.colors.surface,
                         backgroundColor = MaterialTheme.colors.surface
                     ) {}
-                    if (!isPressed3.value){
+                    if (!isPressed3.value) {
                         GameButton(text = charactersList.value[3].toString(), onClick = {
-                            isPressed3.value=true
+                            isPressed3.value = true
                             answer.value = answer.value + charactersList.value[3].toString()
                         })
                     }
@@ -161,48 +161,52 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    if (isPressed1.value &&isPressed0.value &&isPressed2.value &&isPressed3.value ){
+                    if (isPressed1.value && isPressed0.value && isPressed2.value && isPressed3.value) {
                         Button(onClick = {
-                            if (validWords.contains(answer.value) && !quizViewModel.answers.contains(answer.value) ){
+                            if (validWords.contains(answer.value) && !quizViewModel.answers.contains(
+                                    answer.value
+                                )
+                            ) {
                                 quizViewModel.answers.add(answer.value)
-                                answer.value=""
-                                isPressed0.value=false
-                                isPressed1.value=false
-                                isPressed2.value=false
-                                isPressed3.value=false
+                                answer.value = ""
+                                isPressed0.value = false
+                                isPressed1.value = false
+                                isPressed2.value = false
+                                isPressed3.value = false
                                 scope.launch {
-                                  val snackbarResult=  scaffoldState.snackbarHostState.showSnackbar(
-                                        message = if (quizViewModel.answers.size!=validWords.size) "Nice!" else "Excellent Work! You Win",
-                                        actionLabel = if (quizViewModel.answers.size!=validWords.size) null else "Play Again",
-                                        duration = if (quizViewModel.answers.size!=validWords.size) SnackbarDuration.Short else SnackbarDuration.Indefinite
-                                    )
-                                    when(snackbarResult){
-                                        SnackbarResult.ActionPerformed->{
-                                            answer.value=""
+                                    val snackbarResult =
+                                        scaffoldState.snackbarHostState.showSnackbar(
+                                            message = if (quizViewModel.answers.size != validWords.size) "Nice!" else "Excellent Work! You Win",
+                                            actionLabel = if (quizViewModel.answers.size != validWords.size) null else "Play Again",
+                                            duration = if (quizViewModel.answers.size != validWords.size) SnackbarDuration.Short else SnackbarDuration.Indefinite
+                                        )
+                                    when (snackbarResult) {
+                                        SnackbarResult.ActionPerformed -> {
+                                            answer.value = ""
                                             showAnswer.value = false
-                                            isPressed0.value=false
-                                            isPressed1.value=false
-                                            isPressed2.value=false
-                                            isPressed3.value=false
+                                            isPressed0.value = false
+                                            isPressed1.value = false
+                                            isPressed2.value = false
+                                            isPressed3.value = false
                                             quizViewModel.onEvent(QuizGameScreenEvent.AddScore)
                                             quizViewModel.onEvent(QuizGameScreenEvent.ReStart)
                                             quizViewModel.onEvent(QuizGameScreenEvent.AddGameNumber)
                                         }
-                                        SnackbarResult.Dismissed->{}
+                                        SnackbarResult.Dismissed -> {}
                                     }
                                 }
-                            }else{
+                            } else {
                                 scope.launch {
                                     scaffoldState.snackbarHostState.showSnackbar(
                                         message = "Sorry incorrect! Try again",
                                         duration = SnackbarDuration.Short
                                     )
                                 }
-                                answer.value=""
-                                isPressed0.value=false
-                                isPressed1.value=false
-                                isPressed2.value=false
-                                isPressed3.value=false
+                                answer.value = ""
+                                isPressed0.value = false
+                                isPressed1.value = false
+                                isPressed2.value = false
+                                isPressed3.value = false
                             }
                         }) {
                             Text(text = "Submit")
@@ -227,7 +231,9 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                                 border = BorderStroke(
                                     2.dp,
                                     color = MaterialTheme.colors.primary,
-                                ), shape = MaterialTheme.shapes.medium, modifier = Modifier.padding(5.dp)
+                                ),
+                                shape = MaterialTheme.shapes.medium,
+                                modifier = Modifier.padding(5.dp)
                             ) {
                                 if (showAnswer.value || quizViewModel.answers.contains(it)) {
                                     Text(
@@ -256,9 +262,11 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                 }
             }
         }
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp), contentAlignment = Alignment.TopStart) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp), contentAlignment = Alignment.TopStart
+        ) {
             Column() {
                 Text(text = "Games Played: $numberOfGames", modifier = Modifier.padding(5.dp))
                 Text(text = "Your Score : $highScore", modifier = Modifier.padding(5.dp))
@@ -270,20 +278,24 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                 .padding(10.dp),
             contentAlignment = Alignment.TopEnd
         ) {
-           IconButton(onClick = { isDropDown=true  }) {
-               Icon(imageVector = Icons.Default.Info, contentDescription ="help" )
-               DropdownMenu(
-                   expanded = isDropDown,
-                   onDismissRequest = { isDropDown=false }) {
-                   Constants.gameInstructions.forEach { label ->
-                       DropdownMenuItem(onClick = {
-                           isDropDown=false
-                       }) {
-                           Text(text = label, color = MaterialTheme.colors.error, style = MaterialTheme.typography.caption)
-                       }
-                   }
-               }
-           }
+            IconButton(onClick = { isDropDown = true }) {
+                Icon(imageVector = Icons.Default.Info, contentDescription = "help")
+                DropdownMenu(
+                    expanded = isDropDown,
+                    onDismissRequest = { isDropDown = false }) {
+                    Constants.gameInstructions.forEach { label ->
+                        DropdownMenuItem(onClick = {
+                            isDropDown = false
+                        }) {
+                            Text(
+                                text = label,
+                                color = MaterialTheme.colors.error,
+                                style = MaterialTheme.typography.caption
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
