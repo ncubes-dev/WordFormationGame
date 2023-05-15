@@ -1,4 +1,4 @@
-package com.ncubesdev.zimsecpastexampapersandmarksschemes.util.surportAllScreen
+package com.ncubesdev.wordformationgame.util.surportAllScreen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration

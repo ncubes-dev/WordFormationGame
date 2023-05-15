@@ -3,6 +3,7 @@ package com.ncubesdev.wordformationgame.ui.quiz_game
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
@@ -15,6 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ncubesdev.wordformationgame.util.Constants
+import com.ncubesdev.wordformationgame.util.surportAllScreen.WindowInfo
+import com.ncubesdev.wordformationgame.util.surportAllScreen.rememberWindowInfo
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
@@ -38,6 +41,11 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
     val isPressed3 = rememberSaveable { mutableStateOf(false) }
     val answer = rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
+
+
+    val windowInfo = rememberWindowInfo()
+
+
     Scaffold(
         scaffoldState = scaffoldState,
         floatingActionButton = {
@@ -67,7 +75,6 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
             }, shape = MaterialTheme.shapes.medium) {
                 Text(text = "Solution", modifier = Modifier.padding(10.dp))
             }
-
         }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(
@@ -77,6 +84,7 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -213,47 +221,48 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                         }
                     }
                 }
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Solutions",
-                        style = MaterialTheme.typography.h6,
-                        modifier = Modifier.padding(20.dp)
-                    )
-                    LazyRow {
-                        items(validWords) {
-                            Surface(
-                                border = BorderStroke(
-                                    2.dp,
-                                    color = MaterialTheme.colors.primary,
-                                ),
-                                shape = MaterialTheme.shapes.medium,
-                                modifier = Modifier.padding(5.dp)
-                            ) {
-                                if (showAnswer.value || quizViewModel.answers.contains(it)) {
-                                    Text(
-                                        text = it,
-                                        style = MaterialTheme.typography.h4,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(start = 20.dp, end = 20.dp)
-                                    )
-                                } else {
-                                    Surface(
-                                        border = BorderStroke(
-                                            2.dp,
-                                            color = MaterialTheme.colors.primary
-                                        ),
-                                        shape = MaterialTheme.shapes.medium,
-                                        modifier = Modifier
-                                            .width(100.dp)
-                                            .height(40.dp)
-                                            .padding(5.dp)
-                                    ) {
+                if (windowInfo.screenWidthInfo is WindowInfo.WindowType.Compact) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Solutions",
+                            style = MaterialTheme.typography.h6,
+                            modifier = Modifier.padding(20.dp)
+                        )
+                        LazyRow {
+                            items(validWords) {
+                                Surface(
+                                    border = BorderStroke(
+                                        2.dp,
+                                        color = MaterialTheme.colors.primary,
+                                    ),
+                                    shape = MaterialTheme.shapes.medium,
+                                    modifier = Modifier.padding(5.dp)
+                                ) {
+                                    if (showAnswer.value || quizViewModel.answers.contains(it)) {
+                                        Text(
+                                            text = it,
+                                            style = MaterialTheme.typography.h4,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+                                        )
+                                    } else {
+                                        Surface(
+                                            border = BorderStroke(
+                                                2.dp,
+                                                color = MaterialTheme.colors.primary
+                                            ),
+                                            shape = MaterialTheme.shapes.medium,
+                                            modifier = Modifier
+                                                .width(100.dp)
+                                                .height(40.dp)
+                                                .padding(5.dp)
+                                        ) {
+                                        }
                                     }
                                 }
                             }
@@ -262,6 +271,7 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                 }
             }
         }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -270,6 +280,53 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
             Column() {
                 Text(text = "Games Played: $numberOfGames", modifier = Modifier.padding(5.dp))
                 Text(text = "Your Score : $highScore", modifier = Modifier.padding(5.dp))
+                if (windowInfo.screenWidthInfo !is WindowInfo.WindowType.Compact) {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 20.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(
+                            text = "Solutions",
+                            style = MaterialTheme.typography.h6,
+                            modifier = Modifier.padding(10.dp)
+                        )
+                        LazyColumn {
+                            items(validWords) {
+                                Surface(
+                                    border = BorderStroke(
+                                        2.dp,
+                                        color = MaterialTheme.colors.primary,
+                                    ),
+                                    shape = MaterialTheme.shapes.medium,
+                                    modifier = Modifier.padding(5.dp)
+                                ) {
+                                    if (showAnswer.value || quizViewModel.answers.contains(it)) {
+                                        Text(
+                                            text = it,
+                                            style = MaterialTheme.typography.h4,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+                                        )
+                                    } else {
+                                        Surface(
+                                            border = BorderStroke(
+                                                2.dp,
+                                                color = MaterialTheme.colors.primary
+                                            ),
+                                            shape = MaterialTheme.shapes.medium,
+                                            modifier = Modifier
+                                                .width(100.dp)
+                                                .height(40.dp)
+                                                .padding(5.dp)
+                                        ) {
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         Box(

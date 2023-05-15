@@ -14,10 +14,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class QuizViewModel @Inject constructor(
-    private val dataStoreRepository: DataStoreRepository
-) : ViewModel() {
+    private val dataStoreRepository: DataStoreRepository) : ViewModel() {
+
     val answers= mutableStateListOf<String>()
     private var _validWords = MutableStateFlow<List<String>>(emptyList())
+
     val validWords = _validWords.asStateFlow()
     private val characters = ('a'..'z').toList()
 
@@ -31,8 +32,12 @@ class QuizViewModel @Inject constructor(
     val numberOfGames = _numberOfGames.asStateFlow()
 
     init {
-        restart()
+
         viewModelScope.launch {
+            launch {
+                restart()
+            }
+
             launch {
                 dataStoreRepository.getKeyValuePair(Constants.GAME_NUMBER).collect{
                     it?.let {

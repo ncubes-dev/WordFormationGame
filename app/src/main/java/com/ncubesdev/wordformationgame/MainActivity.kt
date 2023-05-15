@@ -12,7 +12,9 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.ncubesdev.wordformationgame.ui.quiz_game.QuizScreen
 import com.ncubesdev.wordformationgame.ui.quiz_game.QuizViewModel
 import com.ncubesdev.wordformationgame.ui.theme.WordFormationGameTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +31,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
     private fun showReviewDialog() {
         val reviewManager = ReviewManagerFactory.create(applicationContext)
         reviewManager.requestReviewFlow().addOnCompleteListener {
