@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "932731620905",
+    "project_id": "wordformationgame",
+    "storage_bucket": "wordformationgame.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:932731620905:android:f42882224dbde71c4e9638",
+        "android_client_info": {
+          "package_name": "com.ncubesdev.wordformationgame"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBanqdMwLP7DvL-ba2T2FZmQa88OE8drvQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

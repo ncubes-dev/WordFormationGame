@@ -19,3 +19,16 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+#-keep class com.ncubesdev.zimsecpastexampapersandmarksschemes.Hilt_MainActivity
+#-keep class com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.uploadScreen.UploadScreenViewModel
+#-keep class com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.chartScreen.ChatScreenViewmodel
+#-keep class com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.pdfViewerScreen.ViewerScreenViewModel
+-keepclassmembers class com.ncubesdev.wordformationgame.models.** {
+  <fields>;
+  <methods>;
+}
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepclassmembers class com.ncubesdev.wordformationgame.models.** {
+  *;
+}

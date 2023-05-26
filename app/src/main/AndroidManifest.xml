@@ -5,6 +5,7 @@
     <application
         android:name=".MyHiltApp"
         android:allowBackup="true"
+        android:hardwareAccelerated="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -15,6 +16,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.WordFormationGame">
             <intent-filter>
@@ -23,6 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-8422212365133928~9401506742" />
+
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.ncubesdev.wordformationgame.repos
+package com.ncubesdev.wordformationgame.dormain.repository
 
 import kotlinx.coroutines.flow.Flow
 

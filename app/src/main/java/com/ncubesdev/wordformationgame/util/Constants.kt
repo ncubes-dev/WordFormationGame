@@ -1,5 +1,6 @@
 package com.ncubesdev.wordformationgame.util
 object Constants {
+    const val ID= "Admin_Id"
     val GAME_NUMBER="gameNumber"
     val SCORE="score"
     val gameInstructions= listOf<String>("Type a four letter word using the given letters and submit. if the word is valid you will win if there are no other words that can be made with the given letters ")

@@ -1,6 +1,8 @@
 package com.ncubesdev.wordformationgame.ui.quiz_game
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,21 +11,30 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.ncubesdev.wordformationgame.util.Constants
+import com.ncubesdev.wordformationgame.util.UiEvents
 import com.ncubesdev.wordformationgame.util.surportAllScreen.WindowInfo
 import com.ncubesdev.wordformationgame.util.surportAllScreen.rememberWindowInfo
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun QuizScreen(quizViewModel: QuizViewModel) {
+fun QuizScreen(quizViewModel: QuizViewModel, showAd: () -> Unit, context: Activity) {
+    val uiState by quizViewModel.uiState.collectAsState()
     var isDropDown by remember { mutableStateOf(false) }
+    var isDropDownList by remember { mutableStateOf(false) }
+    var isDialog by remember { mutableStateOf(false) }
     val scaffoldState = rememberScaffoldState()
     val validWords by quizViewModel.validWords.collectAsState()
     val possibleStrings by quizViewModel.possibleStrings.collectAsState()
@@ -40,11 +51,27 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
     val isPressed2 = rememberSaveable { mutableStateOf(false) }
     val isPressed3 = rememberSaveable { mutableStateOf(false) }
     val answer = rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
 
     val windowInfo = rememberWindowInfo()
-
+    LaunchedEffect(key1 = true) {
+        quizViewModel.uiEvent.collect {
+            when (it) {
+                is UiEvents.Error -> {
+                    Toast.makeText(context,"${it.message}",Toast.LENGTH_LONG).show()
+                }
+                is UiEvents.StartLoading -> {
+                Toast.makeText(context,"Registering...",Toast.LENGTH_LONG).show()
+                }
+                is UiEvents.Success->{
+                    name=""
+                    Toast.makeText(context,"Register Success!",Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -69,6 +96,7 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                             isPressed3.value = false
                             quizViewModel.onEvent(QuizGameScreenEvent.ReStart)
                             quizViewModel.onEvent(QuizGameScreenEvent.AddGameNumber)
+                            showAd()
                         }
                     }
                 }
@@ -200,6 +228,7 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                                             quizViewModel.onEvent(QuizGameScreenEvent.ReStart)
                                             quizViewModel.onEvent(QuizGameScreenEvent.AddGameNumber)
                                         }
+
                                         SnackbarResult.Dismissed -> {}
                                     }
                                 }
@@ -278,8 +307,14 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                 .padding(10.dp), contentAlignment = Alignment.TopStart
         ) {
             Column() {
-                Text(text = "Games Played: $numberOfGames", modifier = Modifier.padding(5.dp))
-                Text(text = "Your Score : $highScore", modifier = Modifier.padding(5.dp))
+                Text(
+                    text = "High Score : ${(uiState.highScorePlayer?.numberOfWins?.toInt() ?: 0) / (uiState.highScorePlayer?.numberOfGames?.toInt() ?: 0)} by ${uiState.highScorePlayer?.name} ",
+                    modifier = Modifier.padding(5.dp)
+                )
+                Text(
+                    text = "Your Score: ${highScore.toInt() / numberOfGames.toInt()}",
+                    modifier = Modifier.padding(5.dp)
+                )
                 if (windowInfo.screenWidthInfo !is WindowInfo.WindowType.Compact) {
                     Column(
                         modifier = Modifier
@@ -335,20 +370,90 @@ fun QuizScreen(quizViewModel: QuizViewModel) {
                 .padding(10.dp),
             contentAlignment = Alignment.TopEnd
         ) {
-            IconButton(onClick = { isDropDown = true }) {
-                Icon(imageVector = Icons.Default.Info, contentDescription = "help")
-                DropdownMenu(
-                    expanded = isDropDown,
-                    onDismissRequest = { isDropDown = false }) {
-                    Constants.gameInstructions.forEach { label ->
-                        DropdownMenuItem(onClick = {
-                            isDropDown = false
-                        }) {
+            DropdownMenu(
+                expanded = isDropDownList,
+                onDismissRequest = { isDropDownList = false }) {
+                uiState.players.forEach { player ->
+                    DropdownMenuItem(onClick = {
+                        isDropDown = false
+                    }) {
+                        Text(
+                            text = player.name+ ": "+"${(player.numberOfWins.toInt()) / (player.numberOfGames.toInt())}",
+                            color = MaterialTheme.colors.error,
+                            style = MaterialTheme.typography.caption
+                        )
+                    }
+                }
+            }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(10.dp),
+            contentAlignment = Alignment.TopEnd
+        ) {
+
+            Dialog(onDismissRequest = { isDialog = true }) {
+                Surface(shape = MaterialTheme.shapes.medium) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                    ) {
+                        OutlinedTextField(value = name, onValueChange = { name = it }, label = {
                             Text(
-                                text = label,
-                                color = MaterialTheme.colors.error,
-                                style = MaterialTheme.typography.caption
+                                text = "Username",
+                                modifier = Modifier.padding(5.dp),
                             )
+                        })
+                        Button(shape = MaterialTheme.shapes.medium, onClick = {
+                            quizViewModel.onEvent(
+                                QuizGameScreenEvent.SignUp(
+                                    name = name,
+                                    context = context
+                                )
+                            )
+                        }) {
+                            Text(text = "Register")
+                        }
+                        if (uiState.loading) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                }
+            }
+            Row() {
+                FloatingActionButton(onClick = {
+                    isDropDownList=true
+                }) {
+                    Icon(imageVector =Icons.Default.Menu, tint=Color.Green, contentDescription = "list")
+                }
+                FloatingActionButton(onClick = {
+                   if (uiState.admin==null){
+                       isDialog = true
+                   }else{
+                      Toast.makeText(context,"You are already registered",Toast.LENGTH_LONG).show()
+                   }
+                }) {
+                    Icon(imageVector =Icons.Default.Person,tint=if (uiState.admin==null) MaterialTheme.colors.error else Color.Green, contentDescription = "register")
+                }
+                FloatingActionButton(onClick = { isDropDown = true }) {
+                    Icon(imageVector = Icons.Default.Info, contentDescription = "help")
+                    DropdownMenu(
+                        expanded = isDropDown,
+                        onDismissRequest = { isDropDown = false }) {
+                        Constants.gameInstructions.forEach { label ->
+                            DropdownMenuItem(onClick = {
+                                isDropDown = false
+                            }) {
+                                Text(
+                                    text = label,
+                                    color = MaterialTheme.colors.error,
+                                    style = MaterialTheme.typography.caption
+                                )
+                            }
                         }
                     }
                 }
