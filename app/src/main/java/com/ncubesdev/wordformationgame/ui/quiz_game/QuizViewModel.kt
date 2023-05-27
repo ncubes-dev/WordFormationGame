@@ -1,8 +1,10 @@
 package com.ncubesdev.wordformationgame.ui.quiz_game
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ncubesdev.wordformationgame.dormain.models.MyOtherApp
 import com.ncubesdev.wordformationgame.dormain.models.Player
 import com.ncubesdev.wordformationgame.dormain.models.UiState
 import com.ncubesdev.wordformationgame.dormain.repository.DataStoreRepository
@@ -56,29 +58,24 @@ class QuizViewModel @Inject constructor(
         _admin,
         _loading,
         _highScorePlayer
-    ) { uiState, players, player,loading ,highScorePlayer-> uiState.copy(highScorePlayer=highScorePlayer,players = players, admin = player, loading = loading) }.stateIn(
+    ) { uiState, players, player, loading, highScorePlayer ->
+        uiState.copy(
+            highScorePlayer = highScorePlayer,
+            players = players,
+            admin = player,
+            loading = loading
+        )
+    }.stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5000),
         UiState()
     )
+    private var _myOtherApps = MutableStateFlow<List<MyOtherApp>>(emptyList())
+    val myOtherApps = _myOtherApps.asStateFlow()
 
     init {
         viewModelScope.launch {
             launch { restart() }
-            launch {
-                firebaseRepository.getPlayers().collect { players ->
-                    _players.value = players
-                    try {
-                        _highScorePlayer.value= if (players.isEmpty()) null else players.first()
-                    }catch (e:Exception){
-                        _highScorePlayer.value =null
-                    }
-                    dataStoreRepository.getKeyValuePair(Constants.ID).collect { nullableId ->
-                        nullableId?.let { id ->
-                            _admin.value = players.find { it.id == id }
-                        }
-                    }
-                }
-            }
+            launch { syncWithServer() }
             launch {
                 dataStoreRepository.getKeyValuePair(Constants.GAME_NUMBER).collect {
                     it?.let {
@@ -93,6 +90,33 @@ class QuizViewModel @Inject constructor(
                     }
                 }
             }
+            launch { getMyOtherApps() }
+        }
+    }
+
+    private suspend fun syncWithServer() {
+        firebaseRepository.getPlayers().collect { players ->
+            _players.value =
+                players.sortedBy { it.numberOfWins.toFloat() / it.numberOfGames.toFloat() }
+                    .reversed()
+            try {
+                _highScorePlayer.value =
+                    if (players.isEmpty()) null else players.sortedBy { it.numberOfWins.toFloat() / it.numberOfGames.toFloat() }
+                        .reversed().first()
+            } catch (e: Exception) {
+                _highScorePlayer.value = null
+            }
+            dataStoreRepository.getKeyValuePair(Constants.ID).collect { nullableId ->
+                nullableId?.let { id ->
+                    _admin.value = players.find { it.id == id }
+                }
+            }
+        }
+    }
+
+    private suspend fun getMyOtherApps() {
+        firebaseRepository.getMyOtherApps().collect { otherApps ->
+            _myOtherApps.value = otherApps
         }
     }
 
@@ -104,24 +128,30 @@ class QuizViewModel @Inject constructor(
                         when (it) {
                             is Response.Failure -> {
                                 _uiEvent.emit(UiEvents.Error(it.e))
-                                _loading.value=false
+                                _loading.value = false
                             }
+
                             is Response.Success -> {
-                                _loading.value=false
-                                _uiEvent.emit(UiEvents.Success)
-                                firebaseRepository.updatePlayer(
-                                    Player(
-                                        name = event.name,
-                                        id = it.data.toString()
+                                launch {
+                                    syncWithServer()
+                                }
+                                launch {
+                                    _loading.value = false
+                                    _uiEvent.emit(UiEvents.Success)
+                                    firebaseRepository.updatePlayer(
+                                        Player(
+                                            name = event.name,
+                                            id = it.data.toString()
+                                        )
                                     )
-                                )
-                                dataStoreRepository.putKeyValuePair(
-                                    key = Constants.ID,
-                                    value = it.data.toString()
-                                )
+                                    dataStoreRepository.putKeyValuePair(
+                                        key = Constants.ID,
+                                        value = it.data.toString()
+                                    )
+                                }
                             }
                             is Response.Loading -> {
-                                _loading.value=true
+                                _loading.value = true
                             }
                         }
                     }
@@ -133,6 +163,16 @@ class QuizViewModel @Inject constructor(
                 answers.clear()
             }
 
+            is QuizGameScreenEvent.SendAppAd -> {
+                viewModelScope.launch {
+                    putApp(event.myOtherApp) {
+                        viewModelScope.launch {
+                            _uiEvent.emit(UiEvents.AppAdSent)
+                        }
+                    }
+                }
+            }
+
             is QuizGameScreenEvent.AddScore -> {
                 viewModelScope.launch {
                     dataStoreRepository.putKeyValuePair(
@@ -140,12 +180,19 @@ class QuizViewModel @Inject constructor(
                         _highScore.value.toInt().plus(1).toString()
                     )
                     _admin.value?.let {
-                    firebaseRepository.updatePlayer(
-                        it.copy(numberOfGames=_numberOfGames.value, numberOfWins = _highScore.value)
-                    )
+                        firebaseRepository.updatePlayer(
+                            it.copy(
+                                numberOfGames = _numberOfGames.value,
+                                numberOfWins = _highScore.value
+                            )
+                        )
+                    }
+                    launch {
+                        syncWithServer()
                     }
                 }
             }
+
             is QuizGameScreenEvent.AddGameNumber -> {
                 viewModelScope.launch {
                     dataStoreRepository.putKeyValuePair(
@@ -154,11 +201,23 @@ class QuizViewModel @Inject constructor(
                     )
                     _admin.value?.let {
                         firebaseRepository.updatePlayer(
-                            it.copy(numberOfGames=_numberOfGames.value, numberOfWins = _highScore.value)
+                            it.copy(
+                                numberOfGames = _numberOfGames.value,
+                                numberOfWins = _highScore.value
+                            )
                         )
+                    }
+                    launch {
+                        syncWithServer()
                     }
                 }
             }
+        }
+    }
+
+    private suspend fun putApp(myOtherApp: MyOtherApp, sent: () -> Unit) {
+        firebaseRepository.putApp(myOtherApp) {
+            sent()
         }
     }
 
@@ -199,6 +258,7 @@ class QuizViewModel @Inject constructor(
         }
         return result
     }
+
     private fun isTrueWord(word: String): Boolean {
         val index = quizWords.binarySearch(word)
         return (index >= 0)

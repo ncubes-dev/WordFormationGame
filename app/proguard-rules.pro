@@ -22,7 +22,7 @@
 #-keep class com.ncubesdev.zimsecpastexampapersandmarksschemes.Hilt_MainActivity
 #-keep class com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.uploadScreen.UploadScreenViewModel
 #-keep class com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.chartScreen.ChatScreenViewmodel
-#-keep class com.ncubesdev.zimsecpastexampapersandmarksschemes.ui.pdfViewerScreen.ViewerScreenViewModel
+-keep class com.ncubesdev.wordformationgame.dormain.models.*
 -keepclassmembers class com.ncubesdev.wordformationgame.models.** {
   <fields>;
   <methods>;

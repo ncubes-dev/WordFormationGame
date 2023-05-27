@@ -10,6 +10,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.ads.MobileAds
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -20,9 +23,12 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.android.play.core.ktx.isFlexibleUpdateAllowed
 import com.google.android.play.core.ktx.isImmediateUpdateAllowed
 import com.google.android.play.core.review.ReviewManagerFactory
+import com.ncubesdev.wordformationgame.ui.other_apps_screen.AddAppAdvertAndAdmin
+import com.ncubesdev.wordformationgame.ui.other_apps_screen.OtherAppsListScreen
 import com.ncubesdev.wordformationgame.ui.quiz_game.QuizScreen
 import com.ncubesdev.wordformationgame.ui.quiz_game.QuizViewModel
 import com.ncubesdev.wordformationgame.ui.theme.WordFormationGameTheme
+import com.ncubesdev.wordformationgame.util.Constants
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,11 +54,22 @@ class MainActivity : ComponentActivity() {
                 showReviewDialog()
                 Surface(color = MaterialTheme.colors.background) {
                     val quizViewModel: QuizViewModel = hiltViewModel()
-                    Column {
-                        QuizScreen(quizViewModel = quizViewModel, context = this@MainActivity, showAd = {
-                            adMobInterstitial.showAdd(
-                                this@MainActivity)
-                        })
+                    val navController= rememberNavController()
+                    NavHost(navController = navController, startDestination = Constants.GAME_SCREEN){
+                        composable(route=Constants.GAME_SCREEN){
+                            Column {
+                                QuizScreen(quizViewModel = quizViewModel, navController = navController, context = this@MainActivity, showAd = {
+                                    adMobInterstitial.showAdd(
+                                        this@MainActivity)
+                                })
+                            }
+                        }
+                        composable(route = Constants.OTHER_APPS){
+                            OtherAppsListScreen(quizViewModel = quizViewModel,navController,this@MainActivity)
+                        }
+                        composable(Constants.ADMIN_PANNEL){
+                            AddAppAdvertAndAdmin(quizViewModel = quizViewModel)
+                        }
                     }
                 }
             }

@@ -1,5 +1,8 @@
 package com.ncubesdev.wordformationgame.util
 object Constants {
+    const val GAME_SCREEN="game_screen"
+    const val OTHER_APPS="other_apps"
+    const val ADMIN_PANNEL="admin_pannel"
     const val ID= "Admin_Id"
     val GAME_NUMBER="gameNumber"
     val SCORE="score"
