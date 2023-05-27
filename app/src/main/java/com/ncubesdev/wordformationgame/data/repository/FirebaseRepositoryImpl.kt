@@ -30,8 +30,10 @@ class FirebaseRepositoryImpl @Inject constructor (
     }.catch {
         emit(Response.Failure(it.message.toString()))
     }
-    override fun updatePlayer(player: Player) {
-        db.collection("players").document(player.id).set(player)
+    override fun updatePlayer(player: Player,success:()->Unit) {
+        db.collection("players").document(player.id).set(player).addOnSuccessListener {
+            success()
+        }
     }
     override fun getPlayers(): Flow<List<Player>> =
         db.collection("players").snapshots().map {

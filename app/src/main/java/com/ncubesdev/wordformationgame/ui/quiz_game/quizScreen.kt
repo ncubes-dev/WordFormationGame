@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
+import com.ncubesdev.wordformationgame.dormain.models.Player
 import com.ncubesdev.wordformationgame.util.Constants
 import com.ncubesdev.wordformationgame.util.UiEvents
 import com.ncubesdev.wordformationgame.util.surportAllScreen.WindowInfo
@@ -38,6 +39,8 @@ fun Float.roundToThreeDecimalPlaces(): Float {
 @Composable
 fun QuizScreen(quizViewModel: QuizViewModel, showAd: () -> Unit, context: Activity,navController:NavController) {
     val uiState by quizViewModel.uiState.collectAsState()
+    val playersList=quizViewModel.playersList
+    val admin=quizViewModel.admin
     var isDropDown by remember { mutableStateOf(false) }
     var isDropDownList by remember { mutableStateOf(false) }
     var isDialog by remember { mutableStateOf(false) }
@@ -56,6 +59,7 @@ fun QuizScreen(quizViewModel: QuizViewModel, showAd: () -> Unit, context: Activi
     val isPressed1 = rememberSaveable { mutableStateOf(false) }
     val isPressed2 = rememberSaveable { mutableStateOf(false) }
     val isPressed3 = rememberSaveable { mutableStateOf(false) }
+    val notLogedIn = rememberSaveable { mutableStateOf(false) }
     val answer = rememberSaveable { mutableStateOf("") }
     var name by rememberSaveable { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -63,10 +67,10 @@ fun QuizScreen(quizViewModel: QuizViewModel, showAd: () -> Unit, context: Activi
 
     val windowInfo = rememberWindowInfo()
     LaunchedEffect(key1 = true) {
-        quizViewModel.uiEvent.collect {
-            when (it) {
+        quizViewModel.uiEvent.collect {event->
+            when (event) {
                 is UiEvents.Error -> {
-                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
                 }
 
                 is UiEvents.StartLoading -> {
@@ -74,6 +78,7 @@ fun QuizScreen(quizViewModel: QuizViewModel, showAd: () -> Unit, context: Activi
                 }
 
                 is UiEvents.Success -> {
+                    isDialog=false
                     name = ""
                     Toast.makeText(context, "Register Success!", Toast.LENGTH_LONG).show()
                 }
@@ -413,19 +418,27 @@ fun QuizScreen(quizViewModel: QuizViewModel, showAd: () -> Unit, context: Activi
                                 )
                             })
                             Button(shape = MaterialTheme.shapes.medium, onClick = {
-                                quizViewModel.onEvent(
-                                    QuizGameScreenEvent.SignUp(
-                                        name = name,
-                                        context = context
-                                    )
-                                )
+                                if(name.isNotEmpty()){
+                                    if ( !playersList.any { it.name==name }){
+                                        quizViewModel.onEvent(
+                                            QuizGameScreenEvent.SignUp(
+                                                name = name.trim(),
+                                                context = context
+                                            )
+                                        )
+                                    }else{
+                                        Toast.makeText(context,"Name already used!",Toast.LENGTH_LONG).show()
+                                    }
+                                }else{
+                                    Toast.makeText(context,"enter a user name",Toast.LENGTH_LONG).show()
+                                }
                             }) {
                                 Text(text = "Register")
                             }
                             if (uiState.loading) {
                                 CircularProgressIndicator()
                             }
-                            Spacer(modifier = Modifier.height(30.dp))
+                            Spacer(modifier = Modifier.height(40.dp))
                         }
                     }
                 }
@@ -443,7 +456,7 @@ fun QuizScreen(quizViewModel: QuizViewModel, showAd: () -> Unit, context: Activi
                     DropdownMenu(
                         expanded = isDropDownList,
                         onDismissRequest = { isDropDownList = false }) {
-                        uiState.players.forEach { player ->
+                        playersList.forEach { player ->
                             DropdownMenuItem(onClick = {
                                 isDropDown = false
                             }) {
@@ -457,7 +470,7 @@ fun QuizScreen(quizViewModel: QuizViewModel, showAd: () -> Unit, context: Activi
                     }
                 }
                 IconButton(onClick = {
-                    if (uiState.admin == null) {
+                    if (admin.value== null ) {
                         isDialog = true
                     } else {
                         isDropDownList = true
@@ -467,7 +480,7 @@ fun QuizScreen(quizViewModel: QuizViewModel, showAd: () -> Unit, context: Activi
                 }) {
                     Icon(
                         imageVector = Icons.Default.Person,
-                        tint = if (uiState.admin == null) MaterialTheme.colors.error else Color.Green,
+                        tint = if (admin.value == null ) MaterialTheme.colors.error else Color.Green,
                         contentDescription = "register"
                     )
                 }

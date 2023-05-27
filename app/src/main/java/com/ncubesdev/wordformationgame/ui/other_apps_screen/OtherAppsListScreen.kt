@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,6 +41,7 @@ import androidx.navigation.NavController
 import com.ncubesdev.wordformationgame.R
 import com.ncubesdev.wordformationgame.ui.quiz_game.QuizViewModel
 import com.ncubesdev.wordformationgame.util.Constants
+import com.ncubesdev.zimsecpastexampapersandmarksschemes.util.shareLink
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -46,26 +49,22 @@ import kotlinx.coroutines.launch
 fun OtherAppsListScreen(
     quizViewModel: QuizViewModel,
     navController:NavController,
-    context: Activity
+    context: Activity,
+    urlIntent:(String)->Unit
 ) {
     val otherApps by quizViewModel.myOtherApps.collectAsState()
     val scope = rememberCoroutineScope()
     var key by remember {
         mutableStateOf(0)
     }
-
+Scaffold(
+    floatingActionButton = { FloatingActionButton(onClick = { context.shareLink("https://play.google.com/store/apps/details?id=com.ncubesdev.wordformationgame") }) {
+        Icon(imageVector = Icons.Default.Share, contentDescription ="share app" )
+    }}
+) {paddingValues->
+    paddingValues.toString()
     Column(modifier = Modifier
         .fillMaxSize()) {
-        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 150.dp)) {
-            items(otherApps) {
-                SubjectCard(
-                    appName = it.name,
-                    painter = painterResource(id = R.drawable.google_play),
-                    des = it.description,
-                    url = it.url
-                )
-            }
-        }
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "Developed By--",
@@ -96,7 +95,20 @@ fun OtherAppsListScreen(
                 style = MaterialTheme.typography.caption
             )
         }
+        LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 150.dp)) {
+            items(otherApps) { myOtherApp ->
+                SubjectCard(
+                    appName = myOtherApp.name,
+                    painter = painterResource(id = R.drawable.google_play),
+                    des = myOtherApp.description,
+                    url = myOtherApp.url,
+                    urlIntent = {urlIntent(it)}
+                )
+            }
+        }
+
     }
+}
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -106,6 +118,7 @@ fun SubjectCard(
     des: String,
     url: String,
     painter: Painter,
+    urlIntent:(String)->Unit
 ) {
     var isDialog by remember {
         mutableStateOf(false)
@@ -127,9 +140,7 @@ fun SubjectCard(
         backgroundColor = MaterialTheme.colors.surface,
     ) {
         if (isDialog) {
-            CustomDialog(description = des, link = url, context = context, name = appName) {
-                isDialog = false
-            }
+            CustomDialog(description = des, onDismissRequest = {isDialog = false}, link = url, name = appName, urlIntent = {urlIntent(it)})
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
@@ -164,8 +175,8 @@ fun CustomDialog(
     description: String,
     link: String,
     name: String,
-    context: Context,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    urlIntent:(String)->Unit
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
             Surface(shape = MaterialTheme.shapes.medium) {
@@ -188,7 +199,7 @@ fun CustomDialog(
                         style = MaterialTheme.typography.body2
                     )
                     Button(shape=MaterialTheme.shapes.medium,onClick = {
-                        urlIntent(url = link, context = context)
+                        urlIntent(link)
                     }) {
                         Text(text = "view in play store")
                     }
@@ -196,8 +207,4 @@ fun CustomDialog(
             }
 //        }
     }
-}
-fun urlIntent(url: String, context: Context) {
-    val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-    ContextCompat.startActivity(context, webIntent, null)///webIntent
 }

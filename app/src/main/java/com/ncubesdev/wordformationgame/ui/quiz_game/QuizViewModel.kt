@@ -2,6 +2,7 @@ package com.ncubesdev.wordformationgame.ui.quiz_game
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ncubesdev.wordformationgame.dormain.models.MyOtherApp
@@ -35,11 +36,11 @@ class QuizViewModel @Inject constructor(
     val answers = mutableStateListOf<String>()
     private var _validWords = MutableStateFlow<List<String>>(emptyList())
     private var _loading = MutableStateFlow<Boolean>(false)
-
+    val admin = mutableStateOf<Player?>(null)
     private var _players = MutableStateFlow<List<Player>>(emptyList())
     private var _admin = MutableStateFlow<Player?>(null)
     private var _highScorePlayer = MutableStateFlow<Player?>(null)
-
+val playersList= mutableStateListOf<Player>()
     val validWords = _validWords.asStateFlow()
     private val characters = ('a'..'z').toList()
 
@@ -99,6 +100,9 @@ class QuizViewModel @Inject constructor(
             _players.value =
                 players.sortedBy { it.numberOfWins.toFloat() / it.numberOfGames.toFloat() }
                     .reversed()
+            _players.value.forEach{
+                playersList.add(it)
+            }
             try {
                 _highScorePlayer.value =
                     if (players.isEmpty()) null else players.sortedBy { it.numberOfWins.toFloat() / it.numberOfGames.toFloat() }
@@ -109,6 +113,7 @@ class QuizViewModel @Inject constructor(
             dataStoreRepository.getKeyValuePair(Constants.ID).collect { nullableId ->
                 nullableId?.let { id ->
                     _admin.value = players.find { it.id == id }
+//                    admin.value=players.find { it.id == id }
                 }
             }
         }
@@ -124,32 +129,38 @@ class QuizViewModel @Inject constructor(
         when (event) {
             is QuizGameScreenEvent.SignUp -> {
                 viewModelScope.launch {
-                    firebaseRepository.anonymousSignIn(event.context).collect {
-                        when (it) {
+                    firebaseRepository.anonymousSignIn(event.context).collect { response ->
+                        when (response) {
                             is Response.Failure -> {
-                                _uiEvent.emit(UiEvents.Error(it.e))
+                                _uiEvent.emit(UiEvents.Error(response.e))
                                 _loading.value = false
                             }
 
                             is Response.Success -> {
+                                admin.value= Player(id = response.data.toString())
+                                playersList.add(admin.value!!)
+                                launch { syncWithServer() }
                                 launch {
-                                    syncWithServer()
-                                }
-                                launch {
-                                    _loading.value = false
-                                    _uiEvent.emit(UiEvents.Success)
                                     firebaseRepository.updatePlayer(
                                         Player(
                                             name = event.name,
-                                            id = it.data.toString()
+                                            id = response.data.toString()
                                         )
-                                    )
+                                    ){
+                                        viewModelScope.launch {
+                                            _uiEvent.emit(UiEvents.Success)
+                                            _loading.value = false
+                                        }
+                                    }
                                     dataStoreRepository.putKeyValuePair(
                                         key = Constants.ID,
-                                        value = it.data.toString()
+                                        value = response.data.toString()
                                     )
+
+
                                 }
                             }
+
                             is Response.Loading -> {
                                 _loading.value = true
                             }
@@ -185,7 +196,7 @@ class QuizViewModel @Inject constructor(
                                 numberOfGames = _numberOfGames.value,
                                 numberOfWins = _highScore.value
                             )
-                        )
+                        ){}
                     }
                     launch {
                         syncWithServer()
@@ -205,7 +216,7 @@ class QuizViewModel @Inject constructor(
                                 numberOfGames = _numberOfGames.value,
                                 numberOfWins = _highScore.value
                             )
-                        )
+                        ){}
                     }
                     launch {
                         syncWithServer()

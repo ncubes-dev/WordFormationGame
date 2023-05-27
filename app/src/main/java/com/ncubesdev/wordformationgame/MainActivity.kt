@@ -1,6 +1,9 @@
 package com.ncubesdev.wordformationgame
 
+import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -8,6 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
@@ -65,7 +69,7 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable(route = Constants.OTHER_APPS){
-                            OtherAppsListScreen(quizViewModel = quizViewModel,navController,this@MainActivity)
+                            OtherAppsListScreen(quizViewModel = quizViewModel,navController,this@MainActivity,urlIntent={urlIntent(it,this@MainActivity)})
                         }
                         composable(Constants.ADMIN_PANNEL){
                             AddAppAdvertAndAdmin(quizViewModel = quizViewModel)
@@ -96,6 +100,20 @@ class MainActivity : ComponentActivity() {
                     info, updateType, this, 123
                 )
             }
+        }
+    }
+//    fun urlIntent(url: String, context: Context) {
+//        val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+//        ContextCompat.startActivity(context, webIntent, null)///webIntent
+//    }
+
+    fun urlIntent(url: String, context: Context) {
+        val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        try {
+            ContextCompat.startActivity(context, webIntent, null)
+        } catch (e: ActivityNotFoundException) {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            ContextCompat.startActivity(context, browserIntent, null)
         }
     }
 

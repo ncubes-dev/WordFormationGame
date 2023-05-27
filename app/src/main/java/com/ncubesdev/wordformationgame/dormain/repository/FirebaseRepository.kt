@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 interface FirebaseRepository {
     fun anonymousSignIn(context: Activity): Flow<Response<String>>
-    fun updatePlayer(player: Player)
+    fun  updatePlayer(player: Player,success:()->Unit)
     fun getPlayers(): Flow<List<Player>>
     suspend fun getMyOtherApps(): Flow<List<MyOtherApp>>
 
